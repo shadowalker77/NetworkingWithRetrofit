@@ -2,9 +2,6 @@ package com.alirezabdn.networking.api.offer;
 
 import android.util.Log;
 
-import com.alirezabdn.networking.ApiClient;
-import com.alirezabdn.networking.ApiInterface;
-import com.alirezabdn.networking.Core;
 import com.alirezabdn.networking.api.ReasonModel;
 import com.alirezabdn.networking.api.ResponseStatus;
 import com.alirezabdn.networking.model.InputModel;
@@ -26,31 +23,18 @@ import retrofit2.Response;
 public abstract class API<GenericRequest extends InputModel, GenericResponse extends ResponseModel>
         extends ReasonModel implements CallApi<GenericRequest> {
 
-    private static ApiInterface apiService;
-    private OnLoginRequired onLoginRequired;
     private GenericResponse responseModel;
     private boolean isRunning;
     private List<WrappedRequest> wrappedRequests;
     private ProgressDialogInterface progressDialogInterface;
 
-    public static ApiInterface getApiService() {
-        if (apiService == null)
-            apiService = ApiClient.getClient(Core.getBaseUrl()).create(ApiInterface.class);
-        return apiService;
-    }
-
     public API() {
         this.wrappedRequests = new ArrayList<>();
     }
 
-    public API(ProgressDialogInterface progressDialogInterface, OnLoginRequired onLoginRequired) {
+    public API(ProgressDialogInterface progressDialogInterface) {
         this();
         this.progressDialogInterface = progressDialogInterface;
-        this.onLoginRequired = onLoginRequired;
-    }
-
-    public interface OnLoginRequired {
-        void onLoginRequired();
     }
 
     public ProgressDialogInterface getProgressDialogInterface() {
@@ -154,7 +138,7 @@ public abstract class API<GenericRequest extends InputModel, GenericResponse ext
 
         public void call() {
             if (inputModel != null)
-                Log.d("Request", new RequestModel(inputModel).toString());
+                Log.d("Req, API: " + API.this.getClass().getSimpleName(), new RequestModel(inputModel).toString());
             isRunning = true;
             showProgressDialog();
             this.responseModelCall = getResponseModelCall().clone();
@@ -170,7 +154,7 @@ public abstract class API<GenericRequest extends InputModel, GenericResponse ext
                 if (responseModel != null) {
                     if (!wrappedRequests.isEmpty())
                         wrappedRequests.remove(0);
-                    Log.d("Response", responseModel.toString());
+                    Log.d("Res, API: " + API.this.getClass().getSimpleName(), responseModel.toString());
                     responseStatus.onSuccess(API.this, responseModel);
                     if (!wrappedRequests.isEmpty())
                         resumeCalls();
@@ -204,9 +188,5 @@ public abstract class API<GenericRequest extends InputModel, GenericResponse ext
         protected void hideProgressDialog() {
             progressDialogInterface.hideProgressDialog();
         }
-    }
-
-    public void setOnLoginRequired(OnLoginRequired onLoginRequired) {
-        this.onLoginRequired = onLoginRequired;
     }
 }

@@ -17,7 +17,7 @@ public abstract class ReasonModel {
     private static final String NO_INTERNET = "دستگاه شما به اینترنت متصل نیست. لطفا بعد از بررسی دوباره تلاش نمایید.";
     private static final String NO_HOST = "ارتباط با سرور برقرار نشد. لطفا دوباره تلاش نمایید.";
 
-    protected void handleError(API offerAPI, Throwable t, ResponseStatus status) {
+    protected void handleError(API api, Throwable t, ResponseStatus status) {
         boolean callback = true;
         boolean canTry = true;
         String message;
@@ -38,7 +38,7 @@ public abstract class ReasonModel {
         } else
             message = NO_HOST;
         if (callback)
-            status.onFail(offerAPI, message, "", canTry);
+            status.onFail(api, message, "", canTry);
     }
 
     public boolean isCodeOk(int code) {
